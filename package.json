@@ -3,9 +3,9 @@
   "version": "1.0.40",
   "description": "MCP server for using the GitLab API",
   "license": "MIT",
-  "author": "zereight",
+  "author": "Falko Timme",
   "type": "module",
-  "bin": "./build/index.js",
+  "bin": "mcp-gitlab": "./build/index.js",
   "files": [
     "build"
   ],
@@ -19,7 +19,7 @@
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "prepare": "npm run build",
     "watch": "tsc --watch",
-    "deploy": "npm publish --access public",
+    "deploy": "npm publish",
     "generate-tools": "npx ts-node scripts/generate-tools-readme.ts"
   },
   "dependencies": {
