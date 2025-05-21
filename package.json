@@ -5,7 +5,9 @@
   "license": "MIT",
   "author": "Falko Timme",
   "type": "module",
-  "bin": "mcp-gitlab": "./build/index.js",
+  "bin": {
+    "mcp-gitlab": "./build/index.js"
+  },
   "files": [
     "build"
   ],
