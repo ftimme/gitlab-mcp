@@ -747,11 +747,11 @@ async function listIssues(
     // Create a deep copy of the issue
     const cleanIssue = JSON.parse(JSON.stringify(issue));
     
-    // Ensure author.avatar_url is a string or undefined
+    // Ensure author.avatar_url is preserved as is (can be string, null, or undefined)
     if (cleanIssue.author) {
       cleanIssue.author = {
         ...cleanIssue.author,
-        avatar_url: cleanIssue.author.avatar_url || undefined
+        avatar_url: cleanIssue.author.avatar_url // Keep original value (string, null, or undefined)
       };
     }
     
@@ -759,7 +759,7 @@ async function listIssues(
     if (Array.isArray(cleanIssue.assignees)) {
       cleanIssue.assignees = cleanIssue.assignees.map((assignee: any) => ({
         ...assignee,
-        avatar_url: assignee.avatar_url || undefined
+        avatar_url: assignee.avatar_url // Keep original value (string, null, or undefined)
       }));
     }
     
