@@ -726,8 +726,66 @@ async function listIssues(
   });
 
   await handleGitLabError(response);
-  const data = await response.json();
-  return z.array(GitLabIssueSchema).parse(data);
+  const data = await response.json() as Array<{
+    id: number;
+    title: string;
+    author?: {
+      username: string;
+      avatar_url: string | null;
+      [key: string]: any;
+    };
+    assignees?: Array<{
+      username: string;
+      avatar_url: string | null;
+      [key: string]: any;
+    }>;
+    [key: string]: any;
+  }>;
+  
+  // Deep clone and transform the data to ensure all avatar_url fields are strings or undefined
+  const sanitizedData = data.map((issue) => {
+    // Create a deep copy of the issue
+    const cleanIssue = JSON.parse(JSON.stringify(issue));
+    
+    // Ensure author.avatar_url is a string or undefined
+    if (cleanIssue.author) {
+      cleanIssue.author = {
+        ...cleanIssue.author,
+        avatar_url: cleanIssue.author.avatar_url || undefined
+      };
+    }
+    
+    // Also check assignees array
+    if (Array.isArray(cleanIssue.assignees)) {
+      cleanIssue.assignees = cleanIssue.assignees.map((assignee: any) => ({
+        ...assignee,
+        avatar_url: assignee.avatar_url || undefined
+      }));
+    }
+    
+    return cleanIssue;
+  });
+  
+  // Log the first issue for debugging
+  if (sanitizedData.length > 0) {
+    console.error('First sanitized issue:', JSON.stringify({
+      id: sanitizedData[0].id,
+      title: sanitizedData[0].title,
+      author: {
+        username: sanitizedData[0].author?.username,
+        avatar_url: sanitizedData[0].author?.avatar_url,
+        has_avatar: 'avatar_url' in (sanitizedData[0].author || {})
+      },
+      assignees: sanitizedData[0].assignees?.map((a: any) => ({
+        username: a?.username,
+        avatar_url: a?.avatar_url,
+        has_avatar: 'avatar_url' in (a || {})
+      }))
+    }, null, 2));
+  }
+  
+  // Validate the sanitized data
+  return z.array(GitLabIssueSchema).parse(sanitizedData);
 }
 
 /**
